@@ -32,7 +32,7 @@ export default class ToRustTransformer extends Transform {
       x.statements.forEach((y) => {
         if (y instanceof NamespaceDeclaration) {
           // FIXME: Hard-coded `near` literal in there
-          if (y.name.text === 'near') {
+          if (y.name.text === 'starknet') {
             y.members.forEach((z) => {
               if (z instanceof ClassDeclaration) {
                 declarations.push(this.resolveClass(z))
@@ -55,7 +55,7 @@ export default class ToRustTransformer extends Transform {
     })
 
     // FIXME: Hard-coded `near` literal in there
-    const file = new File('./near.rs')
+    const file = new File('./starknet.rs')
 
     const aliasesByName = Object.fromEntries(typeAliases.map((alias) => [`Asc${alias.name}`, alias.aliasOf]))
 
@@ -204,7 +204,7 @@ export default class ToRustTransformer extends Transform {
     file.writeLine(`impl AscIndexId for ${aliasName} {`)
     // FIXME: Hard-coded `near` literal in there
     file.writeLine(
-      `    const INDEX_ASC_TYPE_ID: IndexForAscTypeId = IndexForAscTypeId::NearArray${arrayType.inner.name};`,
+      `    const INDEX_ASC_TYPE_ID: IndexForAscTypeId = IndexForAscTypeId::StarknetArray${arrayType.inner.name};`,
     )
     file.writeLine('}')
     file.writeLine('')
@@ -231,7 +231,7 @@ export default class ToRustTransformer extends Transform {
 
     file.writeLine(`impl AscIndexId for ${aliasName} {`)
     // FIXME: Hard-coded `near` literal in there
-    file.writeLine(`    const INDEX_ASC_TYPE_ID: IndexForAscTypeId = IndexForAscTypeId::Near${enumType.name}Enum;`)
+    file.writeLine(`    const INDEX_ASC_TYPE_ID: IndexForAscTypeId = IndexForAscTypeId::Starknet${enumType.name}Enum;`)
     file.writeLine('}')
     file.writeLine('')
   }
@@ -258,7 +258,7 @@ export default class ToRustTransformer extends Transform {
 
     file.writeLine(`impl AscIndexId for Asc${clazz.name} {`)
     // FIXME: Hard-coded `near` literal in there
-    file.writeLine(`    const INDEX_ASC_TYPE_ID: IndexForAscTypeId = IndexForAscTypeId::Near${clazz.name};`)
+    file.writeLine(`    const INDEX_ASC_TYPE_ID: IndexForAscTypeId = IndexForAscTypeId::Starknet${clazz.name};`)
     file.writeLine('}')
     file.writeLine('')
   }
@@ -521,7 +521,13 @@ class BuiltInResolvedType extends ResolvedType {
   }
 
   toRustType(): string {
-    if (this.name === 'bool' || this.name === 'u64' || this.name === 'u32' || this.name === 'i64' || this.name === 'i32') {
+    if (
+      this.name === 'bool' ||
+      this.name === 'u64' ||
+      this.name === 'u32' ||
+      this.name === 'i64' ||
+      this.name === 'i32'
+    ) {
       return this.name
     }
 
