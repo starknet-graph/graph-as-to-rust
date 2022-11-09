@@ -1,38 +1,13 @@
-## The Graph AssemblyScript to Rust
+# `graph-as-to-rust` Fork for StarkNet
 
-This project contains an AssemblyScript compiler's transformer that reads the `graph-ts` source files
-and generates Rust bindings for them.
+This is a [`graph-as-to-rust`](https://github.com/streamingfast/graph-as-to-rust) fork for code generation for [StarkNet](https://starknet.io/) to be used in our [`graph-node` fork](https://github.com/starknet-graph/graph-node). It's created and maintained by the [zkLend](https://zklend.com/) team.
 
-For now, the project is mostly in a rough state but working state. It generates the binding for `near`
-namespace only hard-coding the namespace read as well as the output file.
+The original upstream repository is hard-coded to generate code for `near`. Instead of maintaining documentation on how to change the hard-coded values, we decided to fork it instead to provide an out of the box solution.
 
-### Run
+Powered by a [GitHub Actions workflow](https://github.com/starknet-graph/graph-as-to-rust/actions/workflows/sync.yml), this fork syncs the `master` branch with the upstream continuously:
 
-Ensure that `graph-ts` is a sibling project of this one, you should have under the same folder
-the two project (e.g. `graph-ts` and `graph-as-to-rust`) like so:
+- First, a commit is made on top of the upstream `master` branch to bring files from the [`home`](https://github.com/starknet-graph/graph-as-to-rust/tree/home) branch to `master`. This is necessary for making changes to CI workflows and the README file you're reading right now.
 
-```
-.
-├── graph-as-to-rust
-└── graph-ts
-```
+- Then, actual patch commits living on the fork `master` branch gets rebased. Before pushing, the branch is compiled to make sure it still builds, and the team gets notified if it doesn't.
 
-You can do the following.
-
-In your first terminal, do:
-
-```
-yarn tsc --watch
-```
-
-In the second terminal, do:
-
-```
-node run.js
-```
-
-This will copy AssemblyScript files from `graph-ts` into a temporary folder inside the project,
-then will launch `asc` compiler with the correct transformer and generates a `near.rs` with all the
-NEAR Rust bindings for The Graph.
-
-> You can add `DEBUG="*"` in front of the `node run.js` command to activate debug logs and show more logging.
+Whenever a version is released on the upstream project, we will make the same release except with the patch applied.
